@@ -36,6 +36,8 @@ def wait_for_page_load(driver, timeout: int=15):
 def start_driver(user_data_dir: str)->Any:
 	options = Options()
 	options.add_argument("user-data-dir=" + user_data_dir)
+	options.add_argument("disable-popup-blocking")
+	options.add_argument("--blink-settings=imagesEnabled=false")
 	driver = webdriver.Chrome(options=options)
 
 

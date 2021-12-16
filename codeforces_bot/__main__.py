@@ -12,7 +12,7 @@ def main()->None:
 	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser.add_argument("--user-data-dir", help="Chrome user data directory.", required=True)
 	parser.add_argument("--max-ignore", help="Maximum (inclusive) Codeforces id value to ignore", type=int, default=0)
-	parser.add_argument("--wait-initial", action="store", default=0, type=int,
+	parser.add_argument("--wait-initial", default=0, type=int,
 			help="Wait before start (seconds).")
 	parser.add_argument("contest", help="Codeforces contest URL")
 	parser.add_argument("-m", "--map", nargs=2, help="Example: --map A https://yandex.com/problem/A. Can be specified multiple times", action="append")
@@ -39,10 +39,18 @@ def main()->None:
 		nonlocal status_lines
 		print("======== status::", status)
 		status_lines.append(status+'\n')
-		status_lines=status_lines[-15:]
 		codeforces.set_status(driver, codeforces_contest_url, "".join(status_lines))
 
+
 	print("wait initial=", args.wait_initial)
+
+	print("Check Yandex login:")
+	for url in get_yandex_url.values():
+		driver.get(url)
+		yandex.wait_for_login(driver)
+
+
+	print("wait_initial start")
 	time.sleep(args.wait_initial)
 	print("wait_initial done")
 
@@ -73,7 +81,7 @@ def main()->None:
 				yandex_submission=yandex.do_submit(driver, yandex_url, code)
 			except:
 				traceback.print_exc()
-				print_status(f"{codeforces_submission.id} : cannot submit for some reason...?")
+				print_status(f"{codeforces_submission.id} : temporary (permanent?) error, cannot submit?")
 				codeforces.do_reject(driver,
 						codeforces.build_submission_url(codeforces_contest_url, codeforces_submission.id)
 						)
